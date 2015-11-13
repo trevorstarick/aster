@@ -10,19 +10,22 @@
 #include <string>
 #include <iostream>
 
-#include <SDL2/SDL.h>
-
 #ifdef __APPLE__
-#include <OpenGL/gl3.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
+  #include <SDL2/SDL.h>
+
+  #include <OpenGL/gl3.h>
+  #include <OpenGL/glu.h>
 #else
-#ifdef _WIN32
-  #include <windows.h>
-#endif
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
+  #ifdef _WIN32
+    #include <windows.h>
+  #endif
+
+  #include <SDL.h>
+
+  #include <GL/glew.h>
+
+  #include <GL/gl.h>
+  #include <GL/glu.h>
 #endif
 
 #include "glslProgram.h"

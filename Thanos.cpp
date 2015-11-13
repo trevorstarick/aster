@@ -4,6 +4,8 @@
 
 #include "Thanos.h"
 
+#include <stdio.h>
+
 void error(std::string errorString) {
     std::cout << errorString << std::endl;
     std::cout << "Ripperino!";
@@ -68,6 +70,12 @@ void Thanos::init() {
     #else
 
     SDL_GLContext glContext = SDL_GL_CreateContext(_window);
+    glewExperimental = GL_TRUE;
+    GLenum glewError = glewInit();
+
+    if( glewError != GLEW_OK ) {
+        printf( "Error initializing GLEW! %s\n", glewGetErrorString( glewError ) );
+    }
 
     #endif
 
@@ -84,8 +92,6 @@ void Thanos::init() {
     if(glContext == nullptr) {
         error("GL Context could not be created.");
     }
-
-    // Todo: Add glew support for non OSX
 
     glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
     initShaders();
