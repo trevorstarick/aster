@@ -2,14 +2,15 @@
 // Created by Trevor Starick on 2015-11-12.
 //
 
-#pragma once
-
 #ifndef ASTER_GLSLPROGRAM_H
 #define ASTER_GLSLPROGRAM_H
 
 #include <string>
 
 #ifdef __APPLE__
+# define __gl_h_
+# define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+
     #include <OpenGL/gl3.h>
     #include <OpenGL/glu.h>
 #else
@@ -32,7 +33,8 @@ public:
 
     void compileShaders(const std::string &vertexShaderFilePath, const std::string &fragmentShaderFilePath);
     void linkShaders();
-    void addAttribute(const std::string& attributeName);
+    void addAttribute(const std::string &attributeName);
+    GLint getUniformLocation(const std::string &uniformName);
 
     void use();
     void unuse();

@@ -14,12 +14,8 @@ void error(std::string errorString) {
     exit(1);
 }
 
-Thanos::Thanos() {
-    _window = nullptr;
+Thanos::Thanos() : _mod(2), _screenWidth(1024), _screenHeight(768), _time(0), _window(nullptr) {
     _windowTitle = "Thanos v0.0.1";
-
-    _screenWidth = 1024;
-    _screenHeight = 768;
 
     _gameState = GameState::PLAY;
 }
@@ -31,7 +27,86 @@ Thanos::~Thanos() {
 void Thanos::run() {
     init();
 
-    _sprite.init(-1.0f, -1.0f, 1.0f, 1.0f);
+    double width, height, x, y;
+
+    //top 49
+    //bottom 40
+
+    double tileModTop = ((89.0f + 54.0f) * (0.5 * _mod)) / (float)_screenHeight;
+//    double tileModBot = ((89.0f + 12.0f) * (0.5 * mod)) / (float)_screenHeight;
+    double tileModBot = ((89.0f + 7.0f) * (0.5 * _mod)) / (float)_screenHeight;
+
+
+
+    width = (65.0f / (float)_screenWidth) * _mod;
+    height = (89.0f / (float)_screenHeight) * _mod;
+
+    x = 0 - (width / 2);
+    y = 0 - (height / 2);
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 1.5), y + (tileModTop + (height * 0.5)), width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 0.5), y + (tileModTop + (height * 0.5)), width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - (width * 0.5), y + (tileModTop + (height * 0.5)), width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - (width * 1.5), y + (tileModTop + (height * 0.5)), width, height, "textures/PNG/tileGrass.png");
+
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 2), y + tileModTop, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + width, y + tileModBot, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x, y + tileModTop, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - width, y + tileModTop, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - (width * 2), y + tileModBot, width, height, "textures/PNG/tileGrass.png");
+
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 2.5), y, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 1.5), y, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 0.5), y, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - (width * 0.5), y, width, height, "textures/PNG/tileGrass.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - (width * 0.5), y, width, height, "textures/PNG/tileWater_tile.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - (width * 1.5), y, width, height, "textures/PNG/tileGrass.png");
+
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + width, y - tileModTop, width, height, "textures/PNG/tileDirt.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x, y - tileModTop, width, height, "textures/PNG/tileDirt.png");
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x - width, y - tileModTop, width, height, "textures/PNG/tileDirt.png");
+
+
+
+    _sprites.push_back(new SpriteKit());
+    _sprites.back()->init(x + (width * 0.5), y - (tileModTop * 0.75f + height), width, height, "textures/PNG/tileWater.png");
+
+
 
     gameLoop();
 }
@@ -62,9 +137,16 @@ void Thanos::init() {
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+
     SDL_GLContext glContext = SDL_GL_CreateContext(_window);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+//    glViewport(0, 0, _screenWidth * _mod, _screenHeight * _mod);
+
     GLuint vertexArrayID;
+
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
     #else
@@ -81,8 +163,19 @@ void Thanos::init() {
 
     int glVersionMajor;
     int glVersionMinor;
+
     glGetIntegerv(GL_MAJOR_VERSION, &glVersionMajor);
     glGetIntegerv(GL_MINOR_VERSION, &glVersionMinor);
+
+    printf("\n=== Software Specifications ===\n");
+    printf("Platform: %s\n", SDL_GetPlatform());
+    printf("Video driver: %s\n", SDL_GetCurrentVideoDriver());
+    printf("Audio driver: %s\n", SDL_GetCurrentAudioDriver());
+
+    printf("\n=== Hardware Specifications ===\n");
+    printf("CPU cores: %d\n", SDL_GetCPUCount());
+    printf("RAM amount: %dMB\n", SDL_GetSystemRAM());
+
     printf("\n=== OpenGL Implementation ===\n");
     printf("Vendor: %s\n", glGetString(GL_VENDOR));
     printf("GL Version: %s\n", glGetString(GL_VERSION));
@@ -93,7 +186,7 @@ void Thanos::init() {
         error("GL Context could not be created.");
     }
 
-    glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     initShaders();
 
 }
@@ -101,6 +194,8 @@ void Thanos::init() {
 void Thanos::initShaders() {
     _colorProgram.compileShaders("shaders/colorShading.vert", "shaders/colorShading.frag");
     _colorProgram.addAttribute("vertexPosition");
+    _colorProgram.addAttribute("vertexColor");
+    _colorProgram.addAttribute("vertexUV");
     _colorProgram.linkShaders();
 }
 
@@ -108,6 +203,7 @@ void Thanos::gameLoop() {
 
     while(_gameState != GameState::EXIT) {
         input();
+        _time += 0.01;
         draw();
     }
 }
@@ -144,8 +240,19 @@ void Thanos::draw() {
 
     _colorProgram.use();
 
-    _sprite.draw();
+    glActiveTexture(GL_TEXTURE0);
 
+    GLint textureLocation = _colorProgram.getUniformLocation("samplerTexture");
+    glUniform1i(textureLocation, 0);
+
+//    GLuint timeLocation = _colorProgram.getUniformLocation("time");
+//    glUniform1f(timeLocation, _time);
+
+    for(int i = 0; i < _sprites.size(); i++) {
+        _sprites[i]->draw();
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
     _colorProgram.unuse();
 
     SDL_GL_SwapWindow(_window);

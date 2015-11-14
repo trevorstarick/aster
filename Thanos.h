@@ -2,34 +2,34 @@
 // Created by Trevor Starick on 2015-11-12.
 //
 
-#pragma once
-
 #ifndef ASTER_THANOS_H
 #define ASTER_THANOS_H
 
-#include <string>
-#include <iostream>
-
 #ifdef __APPLE__
-  #include <SDL2/SDL.h>
+# define __gl_h_
+# define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
 
-  #include <OpenGL/gl3.h>
-  #include <OpenGL/glu.h>
+#include <SDL2/SDL.h>
+
+#include <OpenGL/gl3.h>
+#include <OpenGL/glu.h>
 #else
-  #ifdef _WIN32
-    #include <windows.h>
-  #endif
-
-  #include <SDL.h>
-
-  #include <GL/glew.h>
-
-  #include <GL/gl.h>
-  #include <GL/glu.h>
+#ifdef _WIN32
+#include <windows.h>
 #endif
 
-#include "glslProgram.h"
+#include <SDL.h>
 
+#include <GL/glew.h>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
+
+#include <string>
+#include <iostream>
+#include <vector>
+#include "glslProgram.h"
 #include "SpriteKit.h"
 
 enum class GameState {
@@ -54,12 +54,15 @@ private:
     SDL_Window* _window;
     std::string _windowTitle;
 
+    int _mod;
     int _screenWidth;
     int _screenHeight;
 
     GameState   _gameState;
-    SpriteKit   _sprite;
+    std::vector<SpriteKit*> _sprites;
     glslProgram _colorProgram;
+
+    float _time;
 };
 
 

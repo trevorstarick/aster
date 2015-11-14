@@ -15,8 +15,18 @@ glslProgram::glslProgram() : _numAttributes(0), _programID(0), _vertexShaderID(0
 
 glslProgram::~glslProgram() {}
 
-void glslProgram::addAttribute(const std::string& attributeName) {
+void glslProgram::addAttribute(const std::string &attributeName) {
     glBindAttribLocation(_programID, _numAttributes++, attributeName.c_str());
+}
+
+GLint glslProgram::getUniformLocation(const std::string &uniformName) {
+    GLint location = glGetUniformLocation(_programID, uniformName.c_str());
+
+    if(location == GL_INVALID_INDEX) {
+        std::cout << "Uniform " + uniformName + " not found in shader! \n";
+    }
+
+    return location;
 }
 
 void glslProgram::compileShader(const std::string& filePath, GLuint& id) {
