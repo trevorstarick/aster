@@ -1,8 +1,8 @@
-#include "Thanos.h"
+#include "Aster.h"
 
 int main(int argc, char** argv) {
-    Thanos thanos;
-    thanos.run();
+    Aster aster;
+    aster.run();
 
     return 0;
 }

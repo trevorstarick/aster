@@ -8,10 +8,13 @@
 #include <string>
 #include "GLTexture.h"
 
-class ImageLoader {
-public:
-    static GLTexture loadPNG(std::string filePath);
-};
+namespace Thanos {
 
+    class ImageLoader {
+    public:
+        static GLTexture loadPNG(std::string filePath);
+    };
+
+}
 
 #endif //ASTER_IMAGELOADER_H
