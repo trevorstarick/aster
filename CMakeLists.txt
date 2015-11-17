@@ -12,9 +12,9 @@ endif(win32)
 
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(GLM REQUIRED)
 
-include_directories(${SDL2_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR} ${GLM_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/deps/glm")
+include_directories(${SDL2_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR} ${PROJECT_SOURCE_DIR})
 
 set(SOURCE_FILES main.cpp Aster.cpp Aster.h)
 
@@ -22,4 +22,4 @@ add_subdirectory(Thanos)
 
 add_executable(aster ${SHADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(aster ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${GLM_LIBRARY} thanos)
+target_link_libraries(aster ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} thanos)
