@@ -99,8 +99,9 @@ namespace Thanos {
             std::cout << "GL Context could not be created!\n";
         }
 
-        glClearColor((119.0f / 255.0f), (33.0f / 255.0f), (111.0f / 255.0f), 1.0f);
-        //    glClearColor((94.0f/255.0f), (129.0f/255.0f), (162.0f/255.0f), 1.0f);
+//        glClearColor((119.0f / 255.0f), (33.0f / 255.0f), (111.0f / 255.0f), 1.0f);
+//        glClearColor((94.0f/255.0f), (129.0f/255.0f), (162.0f/255.0f), 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         SDL_GL_SetSwapInterval(0);
 

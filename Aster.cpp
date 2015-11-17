@@ -34,43 +34,44 @@ void Aster::initShaders() {
     _colorProgram.linkShaders();
 }
 
-void Aster::gameLoop() {
-    while(_gameState != GameState::EXIT) {
-        float startingTicks = SDL_GetTicks();
-
-        input();
-        _time += 0.01;
-
-        _camera.update();
-
-        draw();
-        calculateFPS();
-
-        static int frameCounter = 0;
-        frameCounter++;
-        if(frameCounter == 10) {
-//            std::cout << std::to_string((int)_fps)) << "\n";
-            frameCounter = 0;
-        }
-
-        float frameTicks = SDL_GetTicks() - startingTicks;
-
-        if(1000.0f / _maxFPS > frameTicks) {
-            SDL_Delay((Uint32)1000.0f / _maxFPS - frameTicks);
-        }
-    }
-}
-
 void Aster::input() {
     SDL_Event event;
 
     const float CAMERA_SPEED = 20.0f;
     const float SCALE_SPEED = 0.1f;
 
-    while(SDL_PollEvent(&event)) {
+    while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
                 _gameState = GameState::EXIT;
+                break;
+            case SDL_CONTROLLERAXISMOTION:
+                switch (event.caxis.axis) {
+                    case SDL_CONTROLLER_AXIS_LEFTX:
+                        std::cout << "LEFTX: " << event.caxis.value << "\n";
+                        break;
+                    case SDL_CONTROLLER_AXIS_LEFTY:
+                        std::cout << "LEFTY: " << event.caxis.value << "\n";
+                        break;
+                    case SDL_CONTROLLER_AXIS_RIGHTX:
+                        std::cout << "RIGHTX: " << event.caxis.value << "\n";
+                        break;
+                    case SDL_CONTROLLER_AXIS_RIGHTY:
+                        std::cout << "RIGHTY: " << event.caxis.value << "\n";
+                        break;
+                    case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+                        std::cout << "TRIGGERLEFT: " << event.caxis.value << "\n";
+                        break;
+                    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+                        std::cout << "TRIGGERRIGHT: " << event.caxis.value << "\n";
+                        break;
+                    default:
+                        break;
+
+                }
+                break;
+            case SDL_CONTROLLERBUTTONDOWN:
+                std::cout << event.cbutton.button << "\n";
                 break;
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
@@ -92,6 +93,9 @@ void Aster::input() {
                     case SDLK_e:
                         _camera.setScale(_camera.getScale() - SCALE_SPEED);
                         break;
+                    default:
+                        break;
+
                 }
 
                 break;
@@ -106,6 +110,35 @@ void Aster::input() {
                 break;
             case SDL_MOUSEWHEEL:
                 break;
+            default:
+                break;
+        }
+    }
+};
+
+void Aster::gameLoop() {
+    while(_gameState != GameState::EXIT) {
+        float startingTicks = SDL_GetTicks();
+
+        input();
+        _time += 0.01;
+
+        _camera.update();
+
+        draw();
+        calculateFPS();
+
+        static int frameCounter = 0;
+        frameCounter++;
+        if(frameCounter == 10) {
+//            std::cout << std::to_string((int)_fps) << "\n";
+            frameCounter = 0;
+        }
+
+        float frameTicks = SDL_GetTicks() - startingTicks;
+
+        if(1000.0f / _maxFPS > frameTicks) {
+            SDL_Delay((Uint32)1000.0f / _maxFPS - frameTicks);
         }
     }
 }
@@ -128,15 +161,10 @@ void Aster::draw() {
 
     _spriteBatch.begin(Thanos::GlyphSortType::FRONT_TO_BACK);
 
-    glm::vec4 pos(0.0f, 0.0f, 65.0f, 89.0f);
-    glm::vec4 uv(0.0f, 0.0f, 1.0f, 1.0f);
-
     static Thanos::GLTexture texture = Thanos::ResourceManager::getTexture("textures/PNG/tileGrass.png");
     static Thanos::GLTexture texture2 = Thanos::ResourceManager::getTexture("textures/PNG/tileStone.png");
 
     Thanos::ColorRGBA8 color;
-
-    color = Thanos::ColorRGBA8(255, 255, 255, 255);
 
     int tileWidth = 65;
     int tileHeight = 89;
@@ -144,7 +172,44 @@ void Aster::draw() {
     int tileModTop = (89 + 54) * 0.5;
     int tileModBot = (89 + 7) * 0.5;
 
-    _spriteBatch.draw(pos + glm::vec4(-(tileWidth/2), 0.0, 0.0, 0.0), uv, texture.id, 0.0f, color);
+    int yIncr = 48;
+
+    int mapWidth = (int)(_screenWidth / tileWidth);
+    int mapHeight = (int)(_screenHeight / yIncr);
+
+
+    int xPos, yPos, xMod;
+
+    yPos = -yIncr;
+
+    color = Thanos::ColorRGBA8(255, 255, 255, 255);
+
+    for(int y = 0; y < mapHeight -2; y++) {
+
+        yPos += yIncr;
+
+        if(y % 2 == 0) {
+            xMod = tileWidth / 2;
+        } else {
+            xMod = 0;
+        }
+
+        for(int x = 0; x < mapWidth -1; x++) {
+
+            xPos = (tileWidth * x);
+            xPos -= ((mapWidth * tileWidth) - (tileWidth / 2)) / 2;
+            xPos += xMod;
+
+
+
+            _spriteBatch.draw(
+                    glm::vec4(xPos, yPos - ((mapHeight * yIncr) - yIncr) / 2, tileWidth, tileHeight),
+                    glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                    texture.id, -y, color);
+
+        }
+
+    }
 
     _spriteBatch.end();
     _spriteBatch.renderBatch();
@@ -193,7 +258,4 @@ void Aster::calculateFPS() {
     } else {
         _fps = 30.0f;
     }
-
-//    std::cout << "FPS: " << _fps << "\n";
-
 }
