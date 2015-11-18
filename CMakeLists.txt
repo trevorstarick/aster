@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.3)
 project(aster)
 
 set(SDL2_PATH ${PROJECT_SOURCE_DIR}/deps/SDL2-2.0.3/i686-w64-mingw32)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
+
 message(WARNING "SDL2 INCLUDE: "  ${SDL2_INCLUDE_DIR})
 message(WARNING "SDL2 LIBRARY: " ${SDL2_LIBRARY})
 

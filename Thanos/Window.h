@@ -19,11 +19,7 @@
 #include <GL/glu.h>
 #endif
 
-#ifdef __APPLE__
-#include <SDL2/SDL.h>
-#else
 #include <SDL.h>
-#endif
 
 #include <string>
 
