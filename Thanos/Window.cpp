@@ -4,7 +4,10 @@
 //
 
 #include <iostream>
+#include <stdio.h>
+
 #include "Window.h"
+
 namespace Thanos {
     Window::Window() {}
     Window::~Window() {}
@@ -64,11 +67,10 @@ namespace Thanos {
 #else // ifdef __APPLE__
 
         SDL_GLContext glContext = SDL_GL_CreateContext(_sdlWindow);
-  glewExperimental = GL_TRUE;
-  GLenum glewError = glewInit();
+  GLenum gl3wError = gl3wInit();
 
-  if (glewError != GLEW_OK) {
-    printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+  if (gl3wError != 0) {
+    printf("Error initializing GL3W!");
   }
 
 #endif // ifdef __APPLE__
