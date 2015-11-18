@@ -7,7 +7,6 @@
 #include "picopng.h"
 #include "IOManager.h"
 
-
 namespace Thanos {
 
     GLTexture ImageLoader::loadPNG(std::string filePath) {

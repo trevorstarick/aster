@@ -5,10 +5,19 @@
 #ifndef ASTER_GLTEXTURE_H
 #define ASTER_GLTEXTURE_H
 
+#ifdef __APPLE__
 # define __gl_h_
 # define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
 #include <OpenGL/gl3.h>
 #include <OpenGL/glu.h>
+#else
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <GL/gl3w.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace Thanos {
     struct GLTexture {

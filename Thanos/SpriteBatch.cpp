@@ -5,6 +5,10 @@
 #include <iostream>
 #include "SpriteBatch.h"
 
+#ifdef _WIN32
+#include <algorithm>
+#endif
+
 namespace Thanos {
     SpriteBatch::SpriteBatch() : _vao(0), _vbo(0) {}
     SpriteBatch::~SpriteBatch() {}

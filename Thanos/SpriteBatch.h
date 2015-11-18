@@ -5,11 +5,19 @@
 #ifndef ASTER_SPRITEBATCH_H
 #define ASTER_SPRITEBATCH_H
 
+#ifdef __APPLE__
 # define __gl_h_
 # define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
-
 #include <OpenGL/gl3.h>
 #include <OpenGL/glu.h>
+#else
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <GL/gl3w.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 #include <glm/glm.hpp>
 
