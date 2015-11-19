@@ -67,9 +67,9 @@ private:
     Thanos::Camera _camera;
     Thanos::SpriteBatch _spriteBatch;
 
-    float _fps;
-    float _maxFPS;
-    float _frameTime;
+	float _fps;
+    int _maxFPS;
+    int _frameTime;
 
     float _time;
 };

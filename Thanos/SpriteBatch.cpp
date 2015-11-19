@@ -21,7 +21,7 @@ namespace Thanos {
         _sortType = sortType;
         _renderBatches.clear();
 
-        for(int i = 0; i < _glyphs.size(); i++) {
+        for(unsigned int i = 0; i < _glyphs.size(); i++) {
             delete _glyphs[i];
         }
 
@@ -62,7 +62,7 @@ namespace Thanos {
     void SpriteBatch::renderBatch() {
 
         glBindVertexArray(_vao);
-        for(int i = 0; i < _renderBatches.size(); i++) {
+        for(unsigned int i = 0; i < _renderBatches.size(); i++) {
             glBindTexture(GL_TEXTURE_2D, _renderBatches[i].texture);
             glDrawArrays(GL_TRIANGLES, _renderBatches[i].offset, _renderBatches[i].numVertices);
         }
@@ -93,7 +93,7 @@ namespace Thanos {
         offset += 6;
 
         //Add all the rest of the glyphs
-        for (int cg = 1; cg < _glyphs.size(); cg++) {
+        for (unsigned int cg = 1; cg < _glyphs.size(); cg++) {
 
             // Check if this glyph can be part of the current batch
             if (_glyphs[cg]->texture != _glyphs[cg - 1]->texture) {

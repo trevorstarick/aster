@@ -45,35 +45,21 @@ namespace Thanos {
             std::cout << "SDL_Window could not be initialized!\n";
         }
 
-
-#ifdef __APPLE__
-
-        // Needed for OSX compatibility
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_CORE);
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,          1);
 
-        SDL_GLContext glContext = SDL_GL_CreateContext(_sdlWindow);
+		SDL_GLContext glContext = SDL_GL_CreateContext(_sdlWindow);
+		GLenum gl3wError = gl3wInit();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (gl3wError != 0) {
+			printf("Error initializing GL3W!");
+		}
 
-        GLuint vertexArrayID;
-
-        glGenVertexArrays(1, &vertexArrayID);
-        glBindVertexArray(vertexArrayID);
-#else // ifdef __APPLE__
-
-        SDL_GLContext glContext = SDL_GL_CreateContext(_sdlWindow);
-  GLenum gl3wError = gl3wInit();
-
-  if (gl3wError != 0) {
-    printf("Error initializing GL3W!");
-  }
-
-#endif // ifdef __APPLE__
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         int glVersionMajor;
         int glVersionMinor;
@@ -101,9 +87,9 @@ namespace Thanos {
             std::cout << "GL Context could not be created!\n";
         }
 
-//        glClearColor((119.0f / 255.0f), (33.0f / 255.0f), (111.0f / 255.0f), 1.0f);
+        glClearColor((119.0f / 255.0f), (33.0f / 255.0f), (111.0f / 255.0f), 1.0f);
 //        glClearColor((94.0f/255.0f), (129.0f/255.0f), (162.0f/255.0f), 1.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         SDL_GL_SetSwapInterval(0);
 

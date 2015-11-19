@@ -21,7 +21,7 @@ namespace Thanos {
         }
     }
 
-    void SpriteKit::init(double x, double y, double width, double height, std::string texturePath) {
+    void SpriteKit::init(float x, float y, float width, float height, std::string texturePath) {
         _x = x;
         _y = y;
         _width = width;

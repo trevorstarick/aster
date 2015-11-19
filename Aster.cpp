@@ -8,7 +8,7 @@ Aster::Aster() :
         _screenHeight(768),
         _time(0.0f),
         _gameState(GameState::PLAY),
-        _maxFPS(60.0f) {
+        _maxFPS(60) {
     _camera.init(_screenWidth, _screenHeight);
 }
 
@@ -118,10 +118,10 @@ void Aster::input() {
 
 void Aster::gameLoop() {
     while(_gameState != GameState::EXIT) {
-        float startingTicks = SDL_GetTicks();
+        int startingTicks = SDL_GetTicks();
 
         input();
-        _time += 0.01;
+        _time += 0.01f;
 
         _camera.update();
 
@@ -135,10 +135,10 @@ void Aster::gameLoop() {
             frameCounter = 0;
         }
 
-        float frameTicks = SDL_GetTicks() - startingTicks;
+        int frameTicks = SDL_GetTicks() - startingTicks;
 
         if(1000.0f / _maxFPS > frameTicks) {
-            SDL_Delay((Uint32)1000.0f / _maxFPS - frameTicks);
+            SDL_Delay((Uint32)(1000.0f / _maxFPS) - frameTicks);
         }
     }
 }
@@ -169,8 +169,8 @@ void Aster::draw() {
     int tileWidth = 65;
     int tileHeight = 89;
 
-    int tileModTop = (89 + 54) * 0.5;
-    int tileModBot = (89 + 7) * 0.5;
+    int tileModTop = (int)((89 + 54) * 0.5f);
+    int tileModBot = (int)((89 + 7) * 0.5f);
 
     int yIncr = 48;
 
@@ -205,7 +205,7 @@ void Aster::draw() {
             _spriteBatch.draw(
                     glm::vec4(xPos, yPos - ((mapHeight * yIncr) - yIncr) / 2, tileWidth, tileHeight),
                     glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-                    texture.id, -y, color);
+                    texture.id, (float)-y, color);
 
         }
 
@@ -222,12 +222,12 @@ void Aster::draw() {
 
 void Aster::calculateFPS() {
     static const int NUM_SAMPLES = 10;
-    static float frameTimes[NUM_SAMPLES];
+    static int frameTimes[NUM_SAMPLES];
     static int currentFrame = 0;
 
-    static float prevTicks = SDL_GetTicks();
+    static int prevTicks = SDL_GetTicks();
 
-    float currentTicks;
+    int currentTicks;
     currentTicks = SDL_GetTicks();
 
     _frameTime = currentTicks - prevTicks;
@@ -254,7 +254,7 @@ void Aster::calculateFPS() {
     frameTimeAverage /= count;
 
     if(frameTimeAverage > 0) {
-        _fps = 1000.0f / frameTimeAverage;
+        _fps = 1000.0f/ frameTimeAverage;
     } else {
         _fps = 30.0f;
     }
