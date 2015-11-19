@@ -32,7 +32,7 @@
 #include <Thanos/SpriteKit.h>
 #include <Thanos/SpriteBatch.h>
 #include <Thanos/Window.h>
-#include <Thanos/Input.h>
+#include <Thanos/InputManager.h>
 #include <Thanos/Camera.h>
 
 #include <vector>
@@ -66,12 +66,15 @@ private:
     Thanos::GLSLProgram _colorProgram;
     Thanos::Camera _camera;
     Thanos::SpriteBatch _spriteBatch;
+    Thanos::InputManager _inputManager;
 
 	float _fps;
     int _maxFPS;
     int _frameTime;
 
     float _time;
+
+	std::vector<SDL_Joystick*> _joysticks;
 };
 
 #endif //ASTER_THANOS_H

@@ -24,6 +24,17 @@ void Aster::init() {
     _window.create("Thanos v0.0.1", _screenWidth, _screenHeight, 0);
     initShaders();
     _spriteBatch.init();
+
+	for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+		if (SDL_IsGameController(i)) {
+			printf("Joystick %i is supported by the game controller interface!\n", i);
+		}
+
+		SDL_Joystick *js = SDL_JoystickOpen(i);
+
+		_joysticks.push_back(js);
+	}
+
 }
 
 void Aster::initShaders() {
@@ -45,61 +56,65 @@ void Aster::input() {
             case SDL_QUIT:
                 _gameState = GameState::EXIT;
                 break;
-            case SDL_CONTROLLERAXISMOTION:
-                switch (event.caxis.axis) {
-                    case SDL_CONTROLLER_AXIS_LEFTX:
-                        std::cout << "LEFTX: " << event.caxis.value << "\n";
-                        break;
-                    case SDL_CONTROLLER_AXIS_LEFTY:
-                        std::cout << "LEFTY: " << event.caxis.value << "\n";
-                        break;
-                    case SDL_CONTROLLER_AXIS_RIGHTX:
-                        std::cout << "RIGHTX: " << event.caxis.value << "\n";
-                        break;
-                    case SDL_CONTROLLER_AXIS_RIGHTY:
-                        std::cout << "RIGHTY: " << event.caxis.value << "\n";
-                        break;
-                    case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-                        std::cout << "TRIGGERLEFT: " << event.caxis.value << "\n";
-                        break;
-                    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-                        std::cout << "TRIGGERRIGHT: " << event.caxis.value << "\n";
-                        break;
-                    default:
-                        break;
-
-                }
-                break;
-            case SDL_CONTROLLERBUTTONDOWN:
-                std::cout << event.cbutton.button << "\n";
-                break;
+			case SDL_JOYAXISMOTION:
+				std::cout << "JOY AXIS: " << std::to_string(event.jaxis.axis) << "::" << event.jaxis.value << "\n";
+				switch (event.jaxis.axis) {
+				case 1:
+					if (event.jaxis.value > 32500) {
+						_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+					} else if(event.jaxis.value < -32500) {
+						_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+					}						
+					break;
+				case 0:
+					if (event.jaxis.value > 32500) {
+						_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
+					}
+					else if (event.jaxis.value < -32500) {
+						_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+					}
+					break;
+				case 2:
+					if (event.jaxis.value > 32500) {
+						_camera.setScale(_camera.getScale() + SCALE_SPEED);
+					}
+					break;
+				case 5:
+					if (event.jaxis.value > 32500) {
+						_camera.setScale(_camera.getScale() - SCALE_SPEED);
+					}
+					break;
+				default:
+					break;
+				}
+				break;
+				break;
+			case SDL_JOYBUTTONDOWN:
+				std::cout << "JOY BUTTON: " << event.jbutton.button << "\n";
+				break;
+			case SDL_JOYHATMOTION:
+				switch (event.jhat.value) {
+				case SDL_HAT_UP:
+					_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+					break;
+				case SDL_HAT_DOWN:
+					_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+					break;
+				case SDL_HAT_LEFT:
+					_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+					break;
+				case SDL_HAT_RIGHT:
+					_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
+					break;
+				default:
+					break;
+				}
+				break;
             case SDL_KEYDOWN:
-                switch (event.key.keysym.sym) {
-                    case SDLK_w:
-                        _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-                        break;
-                    case SDLK_s:
-                        _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-                        break;
-                    case SDLK_a:
-                        _camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-                        break;
-                    case SDLK_d:
-                        _camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
-                        break;
-                    case SDLK_q:
-                        _camera.setScale(_camera.getScale() + SCALE_SPEED);
-                        break;
-                    case SDLK_e:
-                        _camera.setScale(_camera.getScale() - SCALE_SPEED);
-                        break;
-                    default:
-                        break;
-
-                }
-
+                _inputManager.pressedKey(event.key.keysym.sym);
                 break;
             case SDL_KEYUP:
+                _inputManager.releaseKey(event.key.keysym.sym);
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 break;
@@ -113,6 +128,20 @@ void Aster::input() {
             default:
                 break;
         }
+    }
+
+    if(_inputManager.isKeyPressed(SDLK_w)) {
+        _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
+    } if(_inputManager.isKeyPressed(SDLK_s)) {
+        _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
+    } if(_inputManager.isKeyPressed(SDLK_a)) {
+        _camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
+    } if(_inputManager.isKeyPressed(SDLK_d)) {
+        _camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
+    } if(_inputManager.isKeyPressed(SDLK_q)) {
+        _camera.setScale(_camera.getScale() + SCALE_SPEED);
+    } if(_inputManager.isKeyPressed(SDLK_e)) {
+        _camera.setScale(_camera.getScale() - SCALE_SPEED);
     }
 };
 
