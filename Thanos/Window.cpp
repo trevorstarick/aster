@@ -52,11 +52,14 @@ namespace Thanos {
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,          1);
 
 		SDL_GLContext glContext = SDL_GL_CreateContext(_sdlWindow);
+
+#ifdef _WIN32
 		GLenum gl3wError = gl3wInit();
 
 		if (gl3wError != 0) {
 			printf("Error initializing GL3W!");
 		}
+#endif
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
