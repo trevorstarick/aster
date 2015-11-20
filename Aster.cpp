@@ -48,8 +48,11 @@ void Aster::initShaders() {
 void Aster::input() {
     SDL_Event event;
 
-    const float CAMERA_SPEED = 20.0f;
-    const float SCALE_SPEED = 0.1f;
+    const float CAMERA_SPEED = 10.0f;
+    const float SCALE_SPEED = 0.02f;
+
+    const float MAX_ZOOM = 2.0f;
+    const float MIN_ZOOM = 0.5f;
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -130,6 +133,9 @@ void Aster::input() {
         }
     }
 
+    float scale = _camera.getScale();
+
+    // CAMERA PAN
     if(_inputManager.isKeyPressed(SDLK_w)) {
         _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
     } if(_inputManager.isKeyPressed(SDLK_s)) {
@@ -138,10 +144,18 @@ void Aster::input() {
         _camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
     } if(_inputManager.isKeyPressed(SDLK_d)) {
         _camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
+
+    // CAMERA ZOOM
     } if(_inputManager.isKeyPressed(SDLK_q)) {
-        _camera.setScale(_camera.getScale() + SCALE_SPEED);
+        if(scale < MAX_ZOOM - SCALE_SPEED) {
+            _camera.setScale(scale + SCALE_SPEED);
+        }
     } if(_inputManager.isKeyPressed(SDLK_e)) {
-        _camera.setScale(_camera.getScale() - SCALE_SPEED);
+        if(scale > MIN_ZOOM + SCALE_SPEED) {
+            _camera.setScale(scale - SCALE_SPEED);
+        }
+    } if(_inputManager.isKeyPressed(SDLK_q) && _inputManager.isKeyPressed(SDLK_e)) {
+        _camera.setScale(1.0f);
     }
 };
 
@@ -203,9 +217,11 @@ void Aster::draw() {
 
     int yIncr = 48;
 
-    int mapWidth = (int)(_screenWidth / tileWidth);
-    int mapHeight = (int)(_screenHeight / yIncr);
+//    int mapWidth = (int)(_screenWidth / tileWidth);
+//    int mapHeight = (int)(_screenHeight / yIncr);
 
+    int mapWidth = 2;
+    int mapHeight = 3;
 
     int xPos, yPos, xMod;
 
@@ -213,7 +229,7 @@ void Aster::draw() {
 
     color = Thanos::ColorRGBA8(255, 255, 255, 255);
 
-    for(int y = 0; y < mapHeight -2; y++) {
+    for(int y = 0; y < mapHeight-2; y++) {
 
         yPos += yIncr;
 
@@ -223,7 +239,7 @@ void Aster::draw() {
             xMod = 0;
         }
 
-        for(int x = 0; x < mapWidth -1; x++) {
+        for(int x = 0; x < mapWidth-1; x++) {
 
             xPos = (tileWidth * x);
             xPos -= ((mapWidth * tileWidth) - (tileWidth / 2)) / 2;
