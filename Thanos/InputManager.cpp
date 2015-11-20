@@ -6,11 +6,11 @@
 
 namespace Thanos {
     void InputManager::pressedKey(unsigned int keyID) {
-        _keyMap[keyId] = true;
+        _keyMap[keyID] = true;
     }
 
     void InputManager::releaseKey(unsigned int keyID) {
-        _keyMap[keyId] = false;
+        _keyMap[keyID] = false;
     }
 
     void InputManager::pressedJoy(unsigned int joyID, int weight) {
@@ -18,7 +18,7 @@ namespace Thanos {
     }
 
     void InputManager::releaseJoy(unsigned int joyID) {
-        delete _keyMap[joyID];
+        _joyMap[joyID] = 0;
     }
 
     bool InputManager::isKeyPressed(unsigned int keyID) {
