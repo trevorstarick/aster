@@ -34,6 +34,9 @@
 #include <Thanos/Window.h>
 #include <Thanos/InputManager.h>
 #include <Thanos/Camera.h>
+#include <Thanos/Timing.h>
+#include <Thanos/Entities.h>
+#include <Thanos/WorldGen.h>
 
 #include <vector>
 
@@ -51,10 +54,9 @@ public:
 
 private:
     void init();
-    void initShaders();
-    void input();
     void gameLoop();
-    void draw();
+	void inputLoop();
+	void draw();
     void calculateFPS();
 
     Thanos::Window _window;
@@ -67,9 +69,11 @@ private:
     Thanos::Camera _camera;
     Thanos::SpriteBatch _spriteBatch;
     Thanos::InputManager _inputManager;
+    Thanos::Player* _player;
+
+    Thanos::WorldGen* _worldGen;
 
 	float _fps;
-    int _maxFPS;
     int _frameTime;
 
     float _time;

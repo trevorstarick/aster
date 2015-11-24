@@ -8,7 +8,8 @@ Aster::Aster() :
         _screenHeight(768),
         _time(0.0f),
         _gameState(GameState::PLAY),
-        _maxFPS(60) {
+        _fps(0),
+        _player(nullptr){
     _camera.init(_screenWidth, _screenHeight);
 }
 
@@ -21,8 +22,18 @@ void Aster::run() {
 
 void Aster::init() {
     Thanos::init();
+
+    _worldGen = new Thanos::WorldGen();
+    _worldGen->init();
+
     _window.create("Thanos v0.0.1", _screenWidth, _screenHeight, 0);
-    initShaders();
+
+    _colorProgram.compileShaders("shaders/colorShading.vert", "shaders/colorShading.frag");
+    _colorProgram.addAttribute("vertexPosition");
+    _colorProgram.addAttribute("vertexColor");
+    _colorProgram.addAttribute("vertexUV");
+    _colorProgram.linkShaders();
+
     _spriteBatch.init();
 
 	for (int i = 0; i < SDL_NumJoysticks(); ++i) {
@@ -35,17 +46,54 @@ void Aster::init() {
 		_joysticks.push_back(js);
 	}
 
+    _player = new Thanos::Player();
+    _player->init(5.0f, glm::vec2(0, 0), &_inputManager, &_camera);
+
 }
 
-void Aster::initShaders() {
-    _colorProgram.compileShaders("shaders/colorShading.vert", "shaders/colorShading.frag");
-    _colorProgram.addAttribute("vertexPosition");
-    _colorProgram.addAttribute("vertexColor");
-    _colorProgram.addAttribute("vertexUV");
-    _colorProgram.linkShaders();
+void Aster::gameLoop() {
+    const float DESIRED_FPS = 60.0f;
+    const float MAX_DELTA_TIME = 1.0f;
+    const int MAX_PHYSICS_STEPS = 6;
+
+    Thanos::FpsLimiter fpsLimiter;
+    fpsLimiter.setMaxFPS(60.0f);
+
+    float previousTicks = SDL_GetTicks();
+
+    while(_gameState != GameState::EXIT) {
+        fpsLimiter.begin();
+
+        float newTicks = SDL_GetTicks();
+        float frameTime = newTicks - previousTicks;
+        previousTicks = newTicks;
+
+        float sumDeltaTime  = frameTime / DESIRED_FPS;
+
+        _inputManager.update();
+        inputLoop();
+
+        int i = 0;
+
+        while(sumDeltaTime > 0.0f && i < MAX_PHYSICS_STEPS) {
+            float deltaTime = std::min(sumDeltaTime, MAX_DELTA_TIME);
+
+            _player->update(deltaTime);
+
+            sumDeltaTime -= deltaTime;
+            i += 1;
+        }
+
+        _camera.setPosition(_player->getPosition());
+        _camera.update();
+
+        draw();
+
+        _fps = fpsLimiter.end();
+    }
 }
 
-void Aster::input() {
+void Aster::inputLoop() {
     SDL_Event event;
 
     const float CAMERA_SPEED = 10.0f;
@@ -59,72 +107,26 @@ void Aster::input() {
             case SDL_QUIT:
                 _gameState = GameState::EXIT;
                 break;
-			case SDL_JOYAXISMOTION:
-				std::cout << "JOY AXIS: " << std::to_string(event.jaxis.axis) << "::" << event.jaxis.value << "\n";
-				switch (event.jaxis.axis) {
-				case 1:
-					if (event.jaxis.value > 32500) {
-						_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-					} else if(event.jaxis.value < -32500) {
-						_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-					}						
-					break;
-				case 0:
-					if (event.jaxis.value > 32500) {
-						_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
-					}
-					else if (event.jaxis.value < -32500) {
-						_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-					}
-					break;
-				case 2:
-					if (event.jaxis.value > 32500) {
-						_camera.setScale(_camera.getScale() + SCALE_SPEED);
-					}
-					break;
-				case 5:
-					if (event.jaxis.value > 32500) {
-						_camera.setScale(_camera.getScale() - SCALE_SPEED);
-					}
-					break;
-				default:
-					break;
-				}
-				break;
-				break;
-			case SDL_JOYBUTTONDOWN:
-				std::cout << "JOY BUTTON: " << event.jbutton.button << "\n";
-				break;
-			case SDL_JOYHATMOTION:
-				switch (event.jhat.value) {
-				case SDL_HAT_UP:
-					_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-					break;
-				case SDL_HAT_DOWN:
-					_camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-					break;
-				case SDL_HAT_LEFT:
-					_camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-					break;
-				case SDL_HAT_RIGHT:
-					_camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
-					break;
-				default:
-					break;
-				}
-				break;
+//			case SDL_JOYAXISMOTION:
+//				break;
+//			case SDL_JOYBUTTONDOWN:
+//				break;
+//			case SDL_JOYHATMOTION:
+//				break;
+            case SDL_MOUSEMOTION:
+                _inputManager.setMouseCoords(event.motion.x, event.motion.y);
+                break;
             case SDL_KEYDOWN:
-                _inputManager.pressedKey(event.key.keysym.sym);
+                _inputManager.pressKey(event.key.keysym.sym);
                 break;
             case SDL_KEYUP:
                 _inputManager.releaseKey(event.key.keysym.sym);
                 break;
             case SDL_MOUSEBUTTONDOWN:
+                _inputManager.pressKey(event.button.button);
                 break;
             case SDL_MOUSEBUTTONUP:
-                break;
-            case SDL_MOUSEMOTION:
-//                std::cout << "Mousemove: "<< event.motion.x << " " << event.motion.y << "\n";
+                _inputManager.releaseKey(event.button.button);
                 break;
             case SDL_MOUSEWHEEL:
                 break;
@@ -132,59 +134,8 @@ void Aster::input() {
                 break;
         }
     }
-
-    float scale = _camera.getScale();
-
-    // CAMERA PAN
-    if(_inputManager.isKeyPressed(SDLK_w)) {
-        _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, CAMERA_SPEED));
-    } if(_inputManager.isKeyPressed(SDLK_s)) {
-        _camera.setPosition(_camera.getPosition() + glm::vec2(0.0f, -CAMERA_SPEED));
-    } if(_inputManager.isKeyPressed(SDLK_a)) {
-        _camera.setPosition(_camera.getPosition() + glm::vec2(-CAMERA_SPEED, 0.0f));
-    } if(_inputManager.isKeyPressed(SDLK_d)) {
-        _camera.setPosition(_camera.getPosition() + glm::vec2(CAMERA_SPEED, 0.0f));
-
-    // CAMERA ZOOM
-    } if(_inputManager.isKeyPressed(SDLK_q)) {
-        if(scale < MAX_ZOOM - SCALE_SPEED) {
-            _camera.setScale(scale + SCALE_SPEED);
-        }
-    } if(_inputManager.isKeyPressed(SDLK_e)) {
-        if(scale > MIN_ZOOM + SCALE_SPEED) {
-            _camera.setScale(scale - SCALE_SPEED);
-        }
-    } if(_inputManager.isKeyPressed(SDLK_q) && _inputManager.isKeyPressed(SDLK_e)) {
-        _camera.setScale(1.0f);
-    }
 };
 
-void Aster::gameLoop() {
-    while(_gameState != GameState::EXIT) {
-        int startingTicks = SDL_GetTicks();
-
-        input();
-        _time += 0.01f;
-
-        _camera.update();
-
-        draw();
-        calculateFPS();
-
-        static int frameCounter = 0;
-        frameCounter++;
-        if(frameCounter == 10) {
-//            std::cout << std::to_string((int)_fps) << "\n";
-            frameCounter = 0;
-        }
-
-        int frameTicks = SDL_GetTicks() - startingTicks;
-
-        if(1000.0f / _maxFPS > frameTicks) {
-            SDL_Delay((Uint32)(1000.0f / _maxFPS) - frameTicks);
-        }
-    }
-}
 
 void Aster::draw() {
     glClearDepth(1.0f);
@@ -197,9 +148,8 @@ void Aster::draw() {
     GLint textureLocation = _colorProgram.getUniformLocation("samplerTexture");
     glUniform1i(textureLocation, 0);
 
-    GLint pLocation = _colorProgram.getUniformLocation("P");
     glm::mat4 cameraMatrix = _camera.getCameraMatrix();
-
+    GLint pLocation = _colorProgram.getUniformLocation("P");
     glUniformMatrix4fv(pLocation, 1 , GL_FALSE, &(cameraMatrix[0][0]));
 
     _spriteBatch.begin(Thanos::GlyphSortType::FRONT_TO_BACK);
